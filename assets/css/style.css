@@ -1,0 +1,107 @@
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  }
+
+  #detailForm {
+    max-width: 600px;
+    margin: 30px auto;
+    padding: 20px;
+
+    border-radius: 12px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  }
+
+
+  #detailForm label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 6px;
+    color: #333;
+  }
+
+
+  #detailForm input[type="text"],
+  #detailForm input[type="email"],
+  #detailForm input[type="file"],
+  #detailForm textarea {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 18px;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: border 0.3s ease;
+  }
+
+  #detailForm input:focus,
+  #detailForm textarea:focus {
+    border-color: #007bff;
+    outline: none;
+  }
+
+  
+  #detailForm input[type="radio"],
+  #detailForm input[type="checkbox"] {
+    margin-right: 6px;
+  }
+
+  #detailForm .inline-options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    margin-bottom: 18px;
+  }
+
+ 
+  #detailForm button {
+    width: 100%;
+    padding: 12px;
+    background: #007bff;
+    color: #fff;
+    font-size: 16px;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+
+  #detailForm button:hover {
+    background: #0056b3;
+  }
+
+
+  @media (max-width: 480px) {
+    #detailForm {
+      padding: 15px;
+    }
+
+    #detailForm label {
+      font-size: 14px;
+    }
+
+    #detailForm button {
+      font-size: 15px;
+    }
+  }
+
+  #head1 {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #response{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+   margin-top: 3px;
+  }
+
+ img.preview-img {
+        width: 100px;
+        margin-top: 5px;
+    }

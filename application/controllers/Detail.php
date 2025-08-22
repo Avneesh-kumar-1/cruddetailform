@@ -8,20 +8,18 @@ class Detail extends CI_Controller
         parent::__construct();
         $this->load->model('Detail_model');
         $this->load->helper(['form', 'url']);
-        $this->load->library(['form_validation']);
+        $this->load->library(['form_validation', 'upload']);
     }
 
-    // Load Form View
     public function index()
     {
         $this->load->view('detail_form');
     }
 
-    // Save/Insert Data
+  
     public function save()
     {
-        // Form validation rules
-               
+      
         $this->form_validation->set_rules('name', 'Name', 'required');
         $this->form_validation->set_rules('email', 'Email', 'required|valid_email');
         $this->form_validation->set_rules('gender', 'Gender', 'required');
@@ -32,39 +30,32 @@ class Detail extends CI_Controller
             echo json_encode(['status' => 'error', 'errors' => validation_errors()]);
             return;
         }
-// Ensure image is uploaded
-if (empty($_FILES['image']['name'])) {
-    echo json_encode(['status' => 'error', 'errors' => 'Image is required']);
-    return;
-}
 
+        if (empty($_FILES['image']['name'])) {
+            echo json_encode(['status' => 'error', 'errors' => 'Image is required']);
+            return;
+        }
 
-        // Single Image Upload
         $image_name = '';
         if (!empty($_FILES['image']['name'])) {
             $config['upload_path']   = './uploads/images/';
             $config['allowed_types'] = 'jpg|jpeg|png|gif';
-            $config['max_size']      = 2048; // 2MB
-            $this->load->library('upload', $config);
+            $config['max_size']      = 2048; 
+            $this->upload->initialize($config);
 
             if ($this->upload->do_upload('image')) {
                 $image_name = $this->upload->data('file_name');
             } else {
-                echo json_encode([
-                    'status' => 'error',
-                    'errors' => $this->upload->display_errors()
-                ]);
+                echo json_encode(['status' => 'error', 'errors' => $this->upload->display_errors()]);
                 return;
             }
         }
 
-        // Ensure at least one file is uploaded
-if (empty($_FILES['files']['name'][0])) {
-    echo json_encode(['status' => 'error', 'errors' => 'At least one file is required']);
-    return;
-}
+        if (empty($_FILES['files']['name'][0])) {
+            echo json_encode(['status' => 'error', 'errors' => 'At least one file is required']);
+            return;
+        }
 
-        // Multiple Files Upload
         $files = [];
         if (!empty($_FILES['files']['name'][0])) {
             $count_files = count($_FILES['files']['name']);
@@ -77,7 +68,7 @@ if (empty($_FILES['files']['name'][0])) {
 
                 $config['upload_path']   = './uploads/files/';
                 $config['allowed_types'] = 'pdf|doc|docx|txt';
-                $config['max_size']      = 5120; // 5MB
+                $config['max_size']      = 5120; 
                 $this->upload->initialize($config);
 
                 if ($this->upload->do_upload('file')) {
@@ -92,7 +83,7 @@ if (empty($_FILES['files']['name'][0])) {
             }
         }
 
-        // Prepare data
+      
         $data = [
             'name'        => $this->input->post('name'),
             'email'       => $this->input->post('email'),
@@ -104,27 +95,38 @@ if (empty($_FILES['files']['name'][0])) {
         ];
 
         $this->Detail_model->insert_detail($data);
- echo json_encode(['status' => 'success', 'message' => 'Data saved successfully']);
+        echo json_encode(['status' => 'success', 'message' => 'Data saved successfully']);
     }
 
-    // Display Table
+  
     public function list()
     {
         $data['details'] = $this->Detail_model->get_all();
         $this->load->view('detail_list', $data);
     }
 
-    // Load Edit Form
+   
     public function edit($id)
     {
-        $data['detail'] = $this->Detail_model->get_by_id($id);
+        $detail = $this->Detail_model->get_by_id($id);
+
+        if (!$detail) {
+            show_error('Record not found', 404);
+            return;
+        }
+
+        $data['detail'] = $detail;
         $this->load->view('detail_edit', $data);
     }
 
-    // Update Record
     public function update($id)
     {
         $detail = $this->Detail_model->get_by_id($id);
+
+        if (!$detail) {
+            echo json_encode(['status' => 'error', 'errors' => 'Record not found']);
+            return;
+        }
 
         $this->form_validation->set_rules('name', 'Name', 'required');
         $this->form_validation->set_rules('email', 'Email', 'required|valid_email');
@@ -136,30 +138,26 @@ if (empty($_FILES['files']['name'][0])) {
             echo json_encode(['status' => 'error', 'errors' => validation_errors()]);
             return;
         }
-// application\uploads     ./uploads/images/
-        // Single Image Upload
+
         $image_name = $detail->image;
         if (!empty($_FILES['image']['name'])) {
             $config['upload_path']   = './uploads/images/';
             $config['allowed_types'] = 'jpg|jpeg|png|gif';
             $config['max_size']      = 2048;
-            $this->load->library('upload', $config);
+            $this->upload->initialize($config);
 
             if ($this->upload->do_upload('image')) {
                 $image_name = $this->upload->data('file_name');
+
                 if ($detail->image && file_exists('./uploads/images/'.$detail->image)) {
                     unlink('./uploads/images/'.$detail->image);
                 }
             } else {
-                echo json_encode([
-                    'status' => 'error',
-                    'errors' => $this->upload->display_errors()
-                ]);
+                echo json_encode(['status' => 'error', 'errors' => $this->upload->display_errors()]);
                 return;
             }
         }
 
-        // Multiple Files Upload
         $files = $detail->files ? explode(',', $detail->files) : [];
         if (!empty($_FILES['files']['name'][0])) {
             $count_files = count($_FILES['files']['name']);
@@ -175,7 +173,6 @@ if (empty($_FILES['files']['name'][0])) {
                 $config['max_size']      = 5120;
                 $this->upload->initialize($config);
 
-
                 if ($this->upload->do_upload('file')) {
                     $files[] = $this->upload->data('file_name');
                 } else {
@@ -188,7 +185,7 @@ if (empty($_FILES['files']['name'][0])) {
             }
         }
 
-        // Update data
+      
         $data = [
             'name'        => $this->input->post('name'),
             'email'       => $this->input->post('email'),
@@ -203,25 +200,31 @@ if (empty($_FILES['files']['name'][0])) {
         echo json_encode(['status' => 'success', 'message' => 'Data updated successfully']);
     }
 
-    // Delete Record
+
     public function delete($id)
     {
         $detail = $this->Detail_model->get_by_id($id);
 
-        // Delete image file
+        if (!$detail) {
+            echo json_encode(['status' => 'error', 'errors' => 'Record not found']);
+            return;
+        }
+
         if ($detail->image && file_exists('./uploads/images/'.$detail->image)) {
             unlink('./uploads/images/'.$detail->image);
         }
 
-        // Delete multiple files
+      
         if ($detail->files) {
             $fileArr = explode(',', $detail->files);
             foreach ($fileArr as $f) {
-                if (file_exists('./uploads/files/'.$f)) unlink('./uploads/files/'.$f);
+                if (file_exists('./uploads/files/'.$f)) {
+                    unlink('./uploads/files/'.$f);
+                }
             }
         }
 
         $this->Detail_model->delete_detail($id);
-        redirect('detail/list');
+        echo json_encode(['status' => 'success', 'message' => 'Record deleted successfully']);
     }
 }
