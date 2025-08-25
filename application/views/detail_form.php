@@ -4,7 +4,8 @@
 <head>
   <title>Detail Form</title>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <link rel="stylesheet" type="text/css" href="<?= base_url('assets/css/style.css'); ?>">
+  <link rel="stylesheet" type="text/css" href="<?= base_url('assets/css/style.css'); ?>">
+  <link rel="stylesheet" href="https://cdn.ckeditor.com/ckeditor5/46.0.2/ckeditor5.css">
 </head>
 
 <body>
@@ -33,14 +34,40 @@
     <input type="file" name="files[]" multiple><br><br>
 
     <label>Description:</label>
-    <textarea name="description" rows="10"></textarea><br><br>
+    <textarea name="description" id="ckedt" rows="10"></textarea><br><br>
 
     <button type="submit">Submit</button>
   </form>
+  <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+  
+  <script>   CKEDITOR.replace('ckedt');
+ CKEDITOR.instances.ckedt.on('change', function () {
+        var data = this.getData();
 
+        
+        var rows = (data.match(/<p>/g) || []).length;
 
+        if (rows > maxRows) {
+          
+            document.getElementById('editorError').innerHTML =
+                "⚠ Maximum " + maxRows + " rows allowed!";
+
+            
+            var limitedData = data.split("</p>").slice(0, maxRows).join("</p>") + "</p>";
+            this.setData(limitedData);
+
+           
+            this.focus();
+        } else {
+        
+            document.getElementById('editorError').innerHTML = "";
+        }
+    });
+  </script>
 
   <script>
+
+
     $(document).ready(function () {
       $('#detailForm').on('submit', function (e) {
         e.preventDefault();
@@ -54,7 +81,7 @@
           dataType: 'json',
           success: function (response) {
             if (response.status == 'success') {
-              $('#response').html('<p style="color:green">' +  response.message + '</p>');
+              $('#response').html('<p style="color:green">' + response.message + '</p>');
               $('#detailForm')[0].reset();
             } else {
               $('#response').html('<p style="color:red">' + response.errors + '</p>');

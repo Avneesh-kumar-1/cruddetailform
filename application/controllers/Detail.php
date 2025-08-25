@@ -20,7 +20,7 @@ class Detail extends CI_Controller
     public function save()
     {
       
-        $this->form_validation->set_rules('name', 'Name', 'required');
+        $this->form_validation->set_rules('name', 'Name','required');
         $this->form_validation->set_rules('email', 'Email', 'required|valid_email');
         $this->form_validation->set_rules('gender', 'Gender', 'required');
         $this->form_validation->set_rules('hobbies[]', 'Hobbies', 'required');

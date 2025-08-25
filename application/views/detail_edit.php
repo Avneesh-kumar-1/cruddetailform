@@ -49,17 +49,23 @@
             <?php endforeach; endif; ?>
 
         <label>Description:</label>
-        <textarea name="description" rows="10"><?= $detail->description; ?></textarea>
+        <textarea name="description" id="ckedt"><?= $detail->description; ?></textarea>
 
         <button type="submit">Update</button>
     </form>
+     <script src="https://cdn.ckeditor.com/4.22.1/standard/ckeditor.js"></script>
+  
+  <script>   CKEDITOR.replace('ckedt');
+  
+  </script>
+
 
     <div id="response" style="text-align:center; margin-top:15px;"></div>
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
    <script>
 $(document).ready(function () {
     $('#detailForm').on('submit', function (e) {
-        e.preventDefault(); 
+        e.preventDefault();     
 
         var formData = new FormData(this);
 
